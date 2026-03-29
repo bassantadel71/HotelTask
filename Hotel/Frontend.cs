@@ -1,6 +1,7 @@
 ﻿using BLL.Entities;
 using BLL.EntityManager;
 using DLL.Contexts;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -34,7 +35,7 @@ namespace HotelManagementSystem.UI
 
 			_context = new ReservationDbContext();
 			_customerManager = new CustomerManager(_context);
-			_roomManager = new RoomManager(_context);
+			_roomManager = new RoomManager(_context.Database.GetConnectionString());
 			_reservationManager = new ReservationManager(_context);
 		}
 

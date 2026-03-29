@@ -1,5 +1,7 @@
 ﻿using BLL.Entities;
 using BLL.EntityManager;
+using DLL.Contexts;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -20,9 +22,11 @@ namespace Hotel
 
 		private readonly decimal _roomCost;
 		private readonly decimal _foodBill;
+		private readonly ReservationDbContext _context;
 
 		public PaymentForm(decimal roomCost, decimal foodBill)
 		{
+			_context = new ReservationDbContext();
 			InitializeComponent();
 			_roomCost = roomCost;
 			_foodBill = foodBill;
@@ -98,7 +102,7 @@ namespace Hotel
 			
 			try
 			{
-				var manager = new PaymentManager();
+				var manager = new PaymentManager(_context.Database.GetConnectionString());
 				int newId = manager.AddPayment(payment);
 
 				CreatedPayment = payment;

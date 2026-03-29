@@ -15,6 +15,7 @@ namespace Hotel
 			ApplicationConfiguration.Initialize();
 			Application.Run(new Form1());
 			//Application.Run(new Frontend());
+			//Application.Run(new menufood());
 		}
 	}
 }

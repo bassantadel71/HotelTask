@@ -1,5 +1,7 @@
 ﻿using BLL.Entities;
 using BLL.EntityManager;
+using DLL.Contexts;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -12,6 +14,8 @@ namespace Hotel
 {
 	public partial class menufood : Form
 	{
+		private readonly ReservationDbContext _context;
+
 		public Service CreatedService { get; private set; }
 
 		public int ServiceId { get; private set; }
@@ -20,6 +24,7 @@ namespace Hotel
 
 		public menufood()
 		{
+			_context = new ReservationDbContext();
 			InitializeComponent();
 		}
 	
@@ -96,7 +101,7 @@ namespace Hotel
 			
 			try
 			{
-				var manager = new ServiceManager();
+				var manager = new ServiceManager(_context.Database.GetConnectionString());
 				int newId = manager.AddService(service);   
 
 				

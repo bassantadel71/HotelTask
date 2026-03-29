@@ -1,51 +1,77 @@
 ﻿using BLL.Entities;
+using Dapper;
 using DLL.Contexts;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Text;
 
 namespace BLL.EntityManager
 {
 	public class ServiceManager
 	{
-		private ReservationDbContext _context = new ReservationDbContext();
-		public int AddService(Service service)
+		private readonly string _connectionString;
+
+		public ServiceManager(string connectionString)
 		{
-			
-			_context.Services.Add(service);
-			_context.SaveChanges();          
-			return service.Id;
-			
+			_connectionString = connectionString;
 		}
 
-		public Service GetById(int id)
+		private IDbConnection CreateConnection() => new SqlConnection(_connectionString);
+		public int AddService(Service service)
 		{
-			 var s = _context.Services.Find(id);
-			if (s is null) throw new Exception("there is no service with this id");
+			const string sql = @"
+        INSERT INTO Services (BreakFast, Lunch, Dinner, Cleaning, Towel, SSurprise, FoodBill)
+        OUTPUT INSERTED.Id
+        VALUES (@BreakFast, @Lunch, @Dinner, @Cleaning, @Towel, @SSurprise, @FoodBill)";
 
-			return s;
-			
+			using var conn = CreateConnection();
+			return conn.ExecuteScalar<int>(sql, service);
 		}
 
 		public void UpdateService(Service service)
 		{
-			
-			_context.Entry(service).State = EntityState.Modified;
-			_context.SaveChanges();
-			
+			const string sql = @"
+				UPDATE Services
+				SET BreakFast  = @BreakFast,
+					Lunch      = @Lunch,
+					Dinner     = @Dinner,
+					Cleaning   = @Cleaning,
+					Towel      = @Towel,
+					SSurprise  = @SSurprise,
+					FoodBill   = @FoodBill
+				WHERE Id = @Id";
+
+			using var conn = CreateConnection();
+			int rows = conn.Execute(sql, service);
+
+			if (rows == 0)
+				throw new Exception($"Service with id:{service.Id} not found");
 		}
+		
+		public Service GetById(int id)
+		{
+			const string sql = "SELECT * FROM Services WHERE Id = @Id";
+
+			using var conn = CreateConnection();
+			var service = conn.QueryFirstOrDefault<Service>(sql, new { Id = id });
+
+			if (service is null)
+				throw new Exception("There is no service with this id");
+
+			return service;
+		}
+
+		
 
 		public void DeleteService(int id)
 		{
-			
-			var svc = _context.Services.Find(id);
-			if (svc != null)
-			{
-				_context.Services.Remove(svc);
-				_context.SaveChanges();
-			}
-			
+			const string sql = "DELETE FROM Services WHERE Id = @Id";
+
+			using var conn = CreateConnection();
+			conn.Execute(sql, new { Id = id });
 		}
 	}
 
