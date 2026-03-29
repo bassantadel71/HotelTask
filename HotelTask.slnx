@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="BLL/BLL.csproj" />
+  <Project Path="DLL/DLL.csproj" />
+  <Project Path="Hotel/Hotel.csproj" Id="3a725805-dbb7-4d76-90a2-f79ecb03ac21" />
+</Solution>
